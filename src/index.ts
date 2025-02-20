@@ -70,7 +70,7 @@ try {
 
   await checkoutBranch(targetBranch);
 
-  const mainConfig = JSON.parse(await readFile('mint.json', 'utf-8')) as MintConfig;
+  const mainConfig = JSON.parse(await readFile('docs.json', 'utf-8')) as MintConfig;
 
   resetToken = await setToken(token);
   for (const { owner, repo, ref, subdirectory: subrepoSubdirectory } of repos) {
@@ -91,11 +91,11 @@ try {
       await io.rmRF(`${repo}/.git`);
     }
 
-    const subConfig = JSON.parse(await readFile(path.join(repo, 'mint.json'), 'utf-8')) as MintConfig;
+    const subConfig = JSON.parse(await readFile(path.join(repo, 'docs.json'), 'utf-8')) as MintConfig;
     mainConfig.navigation = mergeNavigation(mainConfig.navigation, subConfig.navigation, repo);
   }
 
-  await writeFile('mint.json', JSON.stringify(mainConfig, null, 2));
+  await writeFile('docs.json', JSON.stringify(mainConfig, null, 2));
 
   await execOrThrow('git', ['add', '.']);
   try {

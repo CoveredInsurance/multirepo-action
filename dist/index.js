@@ -51,7 +51,7 @@ try {
     const force = core.getBooleanInput('force');
     process.chdir(subdirectory);
     await checkoutBranch(targetBranch);
-    const mainConfig = JSON.parse(await readFile('mint.json', 'utf-8'));
+    const mainConfig = JSON.parse(await readFile('docs.json', 'utf-8'));
     resetToken = await setToken(token);
     for (const { owner, repo, ref, subdirectory: subrepoSubdirectory } of repos) {
         await io.rmRF(repo);
@@ -69,10 +69,10 @@ try {
         else {
             await io.rmRF(`${repo}/.git`);
         }
-        const subConfig = JSON.parse(await readFile(path.join(repo, 'mint.json'), 'utf-8'));
+        const subConfig = JSON.parse(await readFile(path.join(repo, 'docs.json'), 'utf-8'));
         mainConfig.navigation = mergeNavigation(mainConfig.navigation, subConfig.navigation, repo);
     }
-    await writeFile('mint.json', JSON.stringify(mainConfig, null, 2));
+    await writeFile('docs.json', JSON.stringify(mainConfig, null, 2));
     await execOrThrow('git', ['add', '.']);
     try {
         await exec.exec('git', ['diff-index', '--quiet', '--cached', 'HEAD', '--']) !== 0;
