@@ -46,13 +46,10 @@ const setToken = async (token: string) => {
     execOrThrow("git", ["config", "--local", "--unset-all", headerKey]);
 };
 
-const prependPrefix = (
-  group: NavigationGroup,
-  prefix: string
-): NavigationGroup => {
+const prependPrefix = (group: any, prefix: string): NavigationGroup => {
   return {
     ...group,
-    pages: group.pages.map((entry) =>
+    pages: group.pages.map((entry: any) =>
       typeof entry === "string"
         ? `${prefix}/${entry}`
         : prependPrefix(entry, prefix)
@@ -133,9 +130,10 @@ try {
     core.info(
       "subConfig.navigation: " + JSON.stringify(subConfig.navigation, null, 2)
     );
+    const subconfigNavigation = prependPrefix(subConfig.navigation, repo);
     mainConfig.navigation = mergeNavigation(
       mainConfig.navigation,
-      subConfig.navigation,
+      subconfigNavigation,
       repo
     );
   }
