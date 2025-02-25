@@ -112,17 +112,21 @@ try {
     await execOrThrow("git", args);
 
     if (subrepoSubdirectory) {
+      core.info(`Looking in subrepoSubdirectory: ${subrepoSubdirectory} `);
       const tempDirName = "temporary-docs-dir";
       await io.mv(path.join(repo, subrepoSubdirectory), tempDirName);
       await io.rmRF(repo);
       await io.mv(tempDirName, repo);
     } else {
+      core.info("No subdirectory specified");
       await io.rmRF(`${repo}/.git`);
     }
 
     const subConfig = JSON.parse(
       await readFile(path.join(repo, "docs.json"), "utf-8")
     ) as MintConfig;
+
+    core.info("Read subConfig, merging navigation...");
     mainConfig.navigation = mergeNavigation(
       mainConfig.navigation,
       subConfig.navigation,
@@ -133,6 +137,7 @@ try {
   core.info("Writing updated docs.json");
   await writeFile("docs.json", JSON.stringify(mainConfig, null, 2));
 
+  core.info("Committing changes...");
   await execOrThrow("git", ["add", "."]);
   try {
     (await exec.exec("git", [
