@@ -60,8 +60,8 @@ const prependPrefix = (
   };
 };
 
-const mergeNavigation = (main: Navigation, sub: Navigation, prefix: string) => {
-  return [...main, ...sub.map((group) => prependPrefix(group, prefix))];
+const mergeNavigation = (main: any, sub: any, prefix: string) => {
+  return [...main.tabs, ...sub.tabs];
 };
 
 const checkoutBranch = async (branch: string) => {
