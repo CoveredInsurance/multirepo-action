@@ -32,7 +32,7 @@ const prependPrefix = (group, prefix) => {
     };
 };
 const mergeNavigation = (main, sub, prefix) => {
-    return [...main, ...sub.map((group) => prependPrefix(group, prefix))];
+    return [...main.tabs, ...sub.tabs];
 };
 const checkoutBranch = async (branch) => {
     core.info(`Checking out branch: ${branch}`);
