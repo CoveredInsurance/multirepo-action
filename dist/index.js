@@ -86,6 +86,8 @@ try {
         }
         const subConfig = JSON.parse(await readFile(path.join(repo, "docs.json"), "utf-8"));
         core.info("Read subConfig, merging navigation...");
+        core.info("mainConfig.navigation: " + JSON.stringify(mainConfig.navigation, null, 2));
+        core.info("subConfig.navigation: " + JSON.stringify(subConfig.navigation, null, 2));
         mainConfig.navigation = mergeNavigation(mainConfig.navigation, subConfig.navigation, repo);
     }
     core.info("Writing updated docs.json");
