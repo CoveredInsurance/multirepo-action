@@ -105,7 +105,9 @@ try {
 
     const args = ["clone", "--depth=1"];
     if (ref) args.push("--branch", ref);
-    args.push(`https://${token}:github.com/${owner}/${repo}.git`);
+    const url = `https://oauth2:${token}@github.com/${owner}/${repo}`;
+    args.push(url);
+    core.info(`url is: ${url}`);
 
     await execOrThrow("git", args);
 
