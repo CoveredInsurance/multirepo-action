@@ -34126,7 +34126,9 @@ function repoNamePagesInObjectGraph(obj, repoName) {
     if (Array.isArray(obj.pages)) {
         obj.pages = obj.pages.map((page) => {
             page = page.replace(/^docs\//, ''); // Strip leading "docs/"
-            return require$$1$5.join('docs', repoName, page);
+            const newPage = require$$1$5.join('docs', repoName, page);
+            coreExports.info(`Changed page from ${page} to ${newPage}`);
+            return newPage;
         });
     }
     for (const key in obj) {
