@@ -49,7 +49,7 @@ export async function run(): Promise<void> {
         core.info(`Processing repository: ${owner}/${repo}`)
         await io.rmRF(repo)
 
-        git.clone(token, owner, repo, ref)
+        await git.clone(token, owner, repo, ref)
 
         if (subrepoSubdirectory) {
           core.info(`Looking in subrepoSubdirectory: ${subrepoSubdirectory} `)
@@ -73,7 +73,7 @@ export async function run(): Promise<void> {
       core.info('Writing updated docs.json')
       await writeFile('docs.json', JSON.stringify(wipConfig, null, 2))
 
-      git.commitAndPush(targetBranch, force)
+      await git.commitAndPush(targetBranch, force)
     } finally {
       resetToken?.()
     }
