@@ -3,8 +3,8 @@ description: Combine multiple Mintlify docs repositories
 inputs:
   repos:
     description: >
-      A stringified yaml array containing objects representing the
-      mintlify docs repositories to be aggregated.
+      A stringified yaml array containing objects representing the mintlify docs
+      repositories to be aggregated.
     required: true
   token:
     description: Personal access token (PAT) used to push the aggregated docs

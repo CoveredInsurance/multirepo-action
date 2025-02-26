@@ -1,34 +1,35 @@
 # Mintlify Multirepo Action
 
-This action compiles multiple GitHub repositories containing
-mintlify docs into a single repository. This is useful for
-those who might have multiple products that belong in separate
-repos, but want to keep the docs for each product near the code.
+This action compiles multiple GitHub repositories containing mintlify docs into
+a single repository. This is useful for those who might have multiple products
+that belong in separate repos, but want to keep the docs for each product near
+the code.
 
 This setup involves two types of repositories:
-- **base repository**: The repo in which you are setting up this
-  action. The aggregated docs will live in this repo. The base
-  repository can also contain its own global pages.
-- **subrepositories**: The other repos that will be aggregated
-  into the base repo.
+
+- **base repository**: The repo in which you are setting up this action. The
+  aggregated docs will live in this repo. The base repository can also contain
+  its own global pages.
+- **subrepositories**: The other repos that will be aggregated into the base
+  repo.
 
 Each subrepository must contain a `docs.json` with a valid
 [navigation field](https://mintlify.com/docs/settings/navigation#folders)
-representing the pages in that repository. All other `docs.json`
-settings will be taken from the base repo.
+representing the pages in that repository. All other `docs.json` settings will
+be taken from the base repo.
 
 ## Inputs
 
 ### token (required)
 
-Personal access token (PAT) used to push the aggregated docs to
-the target branch
+Personal access token (PAT) used to push the aggregated docs to the target
+branch
 
 ### repos (required)
 
-A stringified yaml array containing objects representing the
-mintlify docs repositories to be aggregated. These objects
-have the following properties:
+A stringified yaml array containing objects representing the mintlify docs
+repositories to be aggregated. These objects have the following properties:
+
 - `owner`: **(required)** the owner/org of the subrepo
 - `repo`: **(required)** the name of the subrepo
 - `ref`: the branch/ref at which to check out the subrepo
