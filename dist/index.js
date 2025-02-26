@@ -34127,7 +34127,7 @@ function prefixPagesInObjectGraph(obj, prefix) {
         obj.pages = obj.pages.map((page) => `${prefix}/${page}`);
     }
     for (const key in obj) {
-        if (obj.hasOwnProperty(key)) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
             const value = obj[key];
             if (typeof value === 'object' && value !== null) {
                 if (Array.isArray(value)) {
@@ -34235,7 +34235,7 @@ async function run() {
             for (const { owner, repo, ref, subdirectory: subrepoSubdirectory } of repos) {
                 coreExports.info(`Processing repository: ${owner}/${repo}`);
                 await ioExports.rmRF(repo);
-                clone(token, owner, repo, ref);
+                await clone(token, owner, repo, ref);
                 if (subrepoSubdirectory) {
                     coreExports.info(`Looking in subrepoSubdirectory: ${subrepoSubdirectory} `);
                     const tempDirName = 'temporary-docs-dir';
@@ -34253,7 +34253,7 @@ async function run() {
             }
             coreExports.info('Writing updated docs.json');
             await writeFile('docs.json', JSON.stringify(wipConfig, null, 2));
-            commitAndPush(targetBranch, force);
+            await commitAndPush(targetBranch, force);
         }
         finally {
             resetToken?.();
