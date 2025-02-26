@@ -27,11 +27,11 @@ test("main config's tabs are merged with sub config's tabs", () => {
       tabs: [{ pages: ['B', 'C'] }]
     }
   }
-  const result = mergeConfigs(main, sub, 'prefix')
+  const result = mergeConfigs(main, sub, 'repoName')
   expect(result.navigation.tabs[0].pages).toStrictEqual(['A'])
   expect(result.navigation.tabs[1].pages).toStrictEqual([
-    'docs/prefix/B',
-    'docs/prefix/C'
+    'docs/repoName/B',
+    'docs/repoName/C'
   ])
 })
 
@@ -52,25 +52,25 @@ test("main config's navigation properties are preserved (aside from tabs which i
   expect(result.navigation).toMatchObject({ foo: 'bar' })
 })
 
-test("sub config's pages are prefixed", () => {
+test("sub config's pages are inside repoName dir", () => {
   const main = {
-    navigation: { tabs: [{ pages: ['docs/should_not_get_prefixed'] }] }
+    navigation: { tabs: [{ pages: ['docs/should_not_get_changed'] }] }
   }
   const sub = {
-    navigation: { tabs: [{ pages: ['docs/should_get_prefixed'] }] }
+    navigation: { tabs: [{ pages: ['docs/should_get_changed'] }] }
   }
-  const result = mergeConfigs(main, sub, 'expected_prefix')
+  const result = mergeConfigs(main, sub, 'expected_repoName')
   expect(result.navigation.tabs[0].pages).toStrictEqual([
-    'docs/should_not_get_prefixed'
+    'docs/should_not_get_changed'
   ])
   expect(result.navigation.tabs[1].pages).toStrictEqual([
-    'docs/expected_prefix/should_get_prefixed'
+    'docs/expected_repoName/should_get_changed'
   ])
 })
 
 test('it handles groups', () => {
   const main = {
-    navigation: { tabs: [{ pages: ['docs/should_not_get_prefixed'] }] }
+    navigation: { tabs: [{ pages: ['docs/should_not_get_changed'] }] }
   }
   const sub = {
     navigation: {
@@ -82,9 +82,9 @@ test('it handles groups', () => {
       ]
     }
   }
-  const result = mergeConfigs(main, sub, 'expected_prefix')
+  const result = mergeConfigs(main, sub, 'expected_repoName')
   expect(result.navigation.tabs[0].pages).toStrictEqual([
-    'docs/should_not_get_prefixed'
+    'docs/should_not_get_changed'
   ])
   const childTab = result.navigation.tabs[1]
   expect(childTab).toMatchObject({
@@ -92,7 +92,7 @@ test('it handles groups', () => {
     groups: [
       {
         group: 'Overview',
-        pages: ['docs/expected_prefix/getting_started']
+        pages: ['docs/expected_repoName/getting_started']
       }
     ]
   })
@@ -100,7 +100,7 @@ test('it handles groups', () => {
 
 test('it handles multiple nested groups', () => {
   const main = {
-    navigation: { tabs: [{ pages: ['docs/should_not_get_prefixed'] }] }
+    navigation: { tabs: [{ pages: ['docs/should_not_get_changed'] }] }
   }
   const sub = {
     navigation: {
@@ -121,9 +121,9 @@ test('it handles multiple nested groups', () => {
       ]
     }
   }
-  const result = mergeConfigs(main, sub, 'expected_prefix')
+  const result = mergeConfigs(main, sub, 'expected_repoName')
   expect(result.navigation.tabs[0].pages).toStrictEqual([
-    'docs/should_not_get_prefixed'
+    'docs/should_not_get_changed'
   ])
   const childTab = result.navigation.tabs[1]
   expect(childTab).toMatchObject({
@@ -131,11 +131,11 @@ test('it handles multiple nested groups', () => {
     groups: [
       {
         group: 'Overview',
-        pages: ['docs/expected_prefix/getting_started']
+        pages: ['docs/expected_repoName/getting_started']
       },
       {
         group: 'Advanced',
-        pages: ['docs/expected_prefix/advanced']
+        pages: ['docs/expected_repoName/advanced']
       }
     ]
   })

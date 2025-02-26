@@ -34104,14 +34104,14 @@ function parse(src, reviver, options) {
     return doc.toJS(Object.assign({ reviver: _reviver }, options));
 }
 
-function mergeConfigs(main, sub, prefix) {
+function mergeConfigs(main, sub, repoName) {
     const mainTabs = main?.navigation?.tabs || [];
     const subTabs = sub?.navigation?.tabs || [];
-    const subTabsWithPrefix = subTabs.map((tab) => {
-        const prefixedTabs = prefixPagesInObjectGraph(tab, prefix);
-        return prefixedTabs;
+    const subTabsWithrepoName = subTabs.map((tab) => {
+        const repoNameedTabs = repoNamePagesInObjectGraph(tab, repoName);
+        return repoNameedTabs;
     });
-    const mergedTabs = [...mainTabs, ...subTabsWithPrefix];
+    const mergedTabs = [...mainTabs, ...subTabsWithrepoName];
     return {
         ...main,
         navigation: {
@@ -34120,21 +34120,24 @@ function mergeConfigs(main, sub, prefix) {
         }
     };
 }
-function prefixPagesInObjectGraph(obj, prefix) {
+function repoNamePagesInObjectGraph(obj, repoName) {
     if (typeof obj !== 'object' || obj === null)
         return obj;
     if (Array.isArray(obj.pages)) {
-        obj.pages = obj.pages.map((page) => `${prefix}/${page}`);
+        obj.pages = obj.pages.map((page) => {
+            page = page.replace(/^docs\//, ''); // Strip leading "docs/"
+            return require$$1$5.join('docs', repoName, page);
+        });
     }
     for (const key in obj) {
         if (Object.prototype.hasOwnProperty.call(obj, key)) {
             const value = obj[key];
             if (typeof value === 'object' && value !== null) {
                 if (Array.isArray(value)) {
-                    value.forEach((item) => prefixPagesInObjectGraph(item, prefix));
+                    value.forEach((item) => repoNamePagesInObjectGraph(item, repoName));
                 }
                 else {
-                    prefixPagesInObjectGraph(value, prefix);
+                    repoNamePagesInObjectGraph(value, repoName);
                 }
             }
         }

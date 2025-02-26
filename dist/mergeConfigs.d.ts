@@ -1,1 +1,1 @@
-export default function mergeConfigs(main: any, sub: any, prefix: string): any;
+export default function mergeConfigs(main: any, sub: any, repoName: string): any;

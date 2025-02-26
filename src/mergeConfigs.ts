@@ -1,12 +1,12 @@
 import path from 'path'
-export default function mergeConfigs(main: any, sub: any, prefix: string) {
+export default function mergeConfigs(main: any, sub: any, repoName: string) {
   const mainTabs = main?.navigation?.tabs || []
   const subTabs = sub?.navigation?.tabs || []
-  const subTabsWithPrefix = subTabs.map((tab: any) => {
-    const prefixedTabs = prefixPagesInObjectGraph(tab, prefix)
-    return prefixedTabs
+  const subTabsWithrepoName = subTabs.map((tab: any) => {
+    const repoNameedTabs = repoNamePagesInObjectGraph(tab, repoName)
+    return repoNameedTabs
   })
-  const mergedTabs = [...mainTabs, ...subTabsWithPrefix]
+  const mergedTabs = [...mainTabs, ...subTabsWithrepoName]
   return {
     ...main,
     navigation: {
@@ -16,13 +16,13 @@ export default function mergeConfigs(main: any, sub: any, prefix: string) {
   }
 }
 
-function prefixPagesInObjectGraph(obj: any, prefix: string): any {
+function repoNamePagesInObjectGraph(obj: any, repoName: string): any {
   if (typeof obj !== 'object' || obj === null) return obj
 
   if (Array.isArray(obj.pages)) {
     obj.pages = obj.pages.map((page: string) => {
       page = page.replace(/^docs\//, '') // Strip leading "docs/"
-      return path.join('docs', prefix, page)
+      return path.join('docs', repoName, page)
     })
   }
 
@@ -31,9 +31,9 @@ function prefixPagesInObjectGraph(obj: any, prefix: string): any {
       const value = obj[key]
       if (typeof value === 'object' && value !== null) {
         if (Array.isArray(value)) {
-          value.forEach((item) => prefixPagesInObjectGraph(item, prefix))
+          value.forEach((item) => repoNamePagesInObjectGraph(item, repoName))
         } else {
-          prefixPagesInObjectGraph(value, prefix)
+          repoNamePagesInObjectGraph(value, repoName)
         }
       }
     }
