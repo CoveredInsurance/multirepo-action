@@ -50,7 +50,6 @@ export async function run(): Promise<void> {
       core.info(`Read subConfig of ${repo}, merging navigation...`)
       wipConfig = mergeConfigs(wipConfig, subConfig, `docs/${repo}`)
       core.info(`merged subconfig of ${repo}`)
-      core.info(`subconfig: ${JSON.stringify(subConfig, null, 2)}`)
 
       core.info(`Extracting docs from ${repo}/docs...`)
       await io.mv(`${repo}/docs`, `docs/${repo}`)
