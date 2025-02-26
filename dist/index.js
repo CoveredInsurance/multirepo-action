@@ -27247,8 +27247,6 @@ function requireCore () {
 
 var coreExports = requireCore();
 
-var execExports = requireExec();
-
 var ioExports = requireIo();
 
 const ALIAS = Symbol.for('yaml.alias');
@@ -34144,6 +34142,8 @@ function prefixPagesInObjectGraph(obj, prefix) {
     return obj;
 }
 
+var execExports = requireExec();
+
 const execOrThrow = async (...args) => {
     coreExports.info(`Executing command: ${args[0]} ${args[1]?.join(' ') ?? ''}`);
     const exitCode = await execExports.exec(...args);
@@ -34180,6 +34180,38 @@ const checkoutBranch = async (branch) => {
         await execOrThrow('git', ['checkout', '-b', branch]);
     }
 };
+const stagedChangesExist = async () => {
+    const exitCode = await execExports.exec('git', ['diff-index', '--quiet', '--cached', 'HEAD', '--'], { ignoreReturnCode: true });
+    return exitCode !== 0;
+};
+const commitAndPush = async (targetBranch, force) => {
+    coreExports.info('Committing changes...');
+    await execOrThrow('git', ['add', '.']);
+    if ((await stagedChangesExist()) == false) {
+        coreExports.info('No changes detected, skipping commit...');
+    }
+    else {
+        await execOrThrow('git', ['config', 'user.name', 'Mintie Bot']);
+        await execOrThrow('git', ['config', 'user.email', 'aws@mintlify.com']);
+        await execOrThrow('git', ['commit', '-m', 'update']);
+        const pushArgs = ['push'];
+        if (force)
+            pushArgs.push('--force');
+        pushArgs.push('origin', targetBranch);
+        coreExports.info('Pushing changes...');
+        await execOrThrow('git', pushArgs);
+    }
+};
+const clone = async (token, owner, repo, branch = 'main') => {
+    const args = ['clone', '--depth=1'];
+    if (branch)
+        args.push('--branch', branch);
+    const url = `https://oauth2:${token}@github.com/${owner}/${repo}`;
+    args.push(url);
+    coreExports.info(`url is: ${url}`);
+    await execOrThrow('git', args);
+};
+
 /**
  * The main function for the action.
  *
@@ -34203,13 +34235,7 @@ async function run() {
             for (const { owner, repo, ref, subdirectory: subrepoSubdirectory } of repos) {
                 coreExports.info(`Processing repository: ${owner}/${repo}`);
                 await ioExports.rmRF(repo);
-                const args = ['clone', '--depth=1'];
-                if (ref)
-                    args.push('--branch', ref);
-                const url = `https://oauth2:${token}@github.com/${owner}/${repo}`;
-                args.push(url);
-                coreExports.info(`url is: ${url}`);
-                await execOrThrow('git', args);
+                clone(token, owner, repo, ref);
                 if (subrepoSubdirectory) {
                     coreExports.info(`Looking in subrepoSubdirectory: ${subrepoSubdirectory} `);
                     const tempDirName = 'temporary-docs-dir';
@@ -34227,39 +34253,7 @@ async function run() {
             }
             coreExports.info('Writing updated docs.json');
             await writeFile('docs.json', JSON.stringify(wipConfig, null, 2));
-            coreExports.info('Committing changes...');
-            await execOrThrow('git', ['add', '.']);
-            try {
-                ;
-                (await execExports.exec('git', [
-                    'diff-index',
-                    '--quiet',
-                    '--cached',
-                    'HEAD',
-                    '--'
-                ])) !== 0;
-                coreExports.info('No changes detected, skipping commit...');
-            }
-            catch {
-                await execOrThrow('git', ['config', 'user.name', 'Mintie Bot']);
-                await execOrThrow('git', ['config', 'user.email', 'aws@mintlify.com']);
-                await execOrThrow('git', ['commit', '-m', 'update']);
-                const pushArgs = ['push'];
-                if (force)
-                    pushArgs.push('--force');
-                pushArgs.push('origin', targetBranch);
-                coreExports.info('Pushing changes...');
-                await execOrThrow('git', pushArgs);
-            }
-        }
-        catch (error) {
-            const message = error &&
-                typeof error === 'object' &&
-                'message' in error &&
-                typeof error.message === 'string'
-                ? error.message
-                : JSON.stringify(error, null, 2);
-            coreExports.setFailed(message);
+            commitAndPush(targetBranch, force);
         }
         finally {
             resetToken?.();
