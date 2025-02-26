@@ -1,6 +1,7 @@
 import * as exec from '@actions/exec';
 export declare const execOrThrow: (...args: Parameters<typeof exec.exec>) => Promise<void>;
-export declare const setToken: (token: string) => Promise<() => Promise<void>>;
+export declare const setToken: (token: string) => Promise<void>;
+export declare const clearToken: () => Promise<void>;
 export declare const checkoutBranch: (branch: string) => Promise<void>;
 export declare const stagedChangesExist: () => Promise<boolean>;
 export declare const commitAndPush: (targetBranch: string, force: boolean) => Promise<void>;

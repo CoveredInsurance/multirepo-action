@@ -34150,18 +34150,20 @@ const execOrThrow = async (...args) => {
     if (exitCode !== 0)
         throw Error(`error running command: ${args[0]} ${args[1]?.join(' ') ?? ''}`);
 };
+const headerKey = 'http.https://github.com/.extraheader';
 const setToken = async (token) => {
     coreExports.info('Setting GitHub token');
     const encodedToken = Buffer.from(`x-access-token:${token}`, 'utf-8').toString('base64');
     coreExports.setSecret(encodedToken);
     const headerPlaceholder = 'Authorization: basic ***';
     const headerValue = `Authorization: basic ${encodedToken}`;
-    const headerKey = 'http.https://github.com/.extraheader';
     const configPath = '.git/config';
     await execOrThrow('git', ['config', '--local', headerKey, headerPlaceholder]);
     const configString = await readFile(configPath, 'utf-8');
     await writeFile(configPath, configString.replace(headerPlaceholder, headerValue));
-    return () => execOrThrow('git', ['config', '--local', '--unset-all', headerKey]);
+};
+const clearToken = async () => {
+    await execOrThrow('git', ['config', '--local', '--unset-all', headerKey]);
 };
 const checkoutBranch = async (branch) => {
     coreExports.info(`Checking out branch: ${branch}`);
@@ -34219,50 +34221,46 @@ const clone = async (token, owner, repo, branch = 'main') => {
  */
 async function run() {
     try {
-        let resetToken;
-        try {
-            const token = coreExports.getInput('token');
-            const repos = parse(coreExports.getInput('repos'));
-            const targetBranch = coreExports.getInput('target-branch');
-            const subdirectory = coreExports.getInput('subdirectory');
-            const force = coreExports.getBooleanInput('force');
-            coreExports.info(`Changing directory to: ${subdirectory}`);
-            process.chdir(subdirectory);
-            await checkoutBranch(targetBranch);
-            const mainConfig = JSON.parse(await readFile('docs.json', 'utf-8'));
-            let wipConfig = mainConfig;
-            resetToken = await setToken(token);
-            for (const { owner, repo, ref, subdirectory: subrepoSubdirectory } of repos) {
-                coreExports.info(`Processing repository: ${owner}/${repo}`);
+        const token = coreExports.getInput('token');
+        const repos = parse(coreExports.getInput('repos'));
+        const targetBranch = coreExports.getInput('target-branch');
+        const subdirectory = coreExports.getInput('subdirectory');
+        const force = coreExports.getBooleanInput('force');
+        coreExports.info(`Changing directory to: ${subdirectory}`);
+        process.chdir(subdirectory);
+        await checkoutBranch(targetBranch);
+        const mainConfig = JSON.parse(await readFile('docs.json', 'utf-8'));
+        await setToken(token);
+        let wipConfig = mainConfig;
+        for (const { owner, repo, ref, subdirectory: subrepoSubdirectory } of repos) {
+            coreExports.info(`Processing repository: ${owner}/${repo}`);
+            await ioExports.rmRF(repo);
+            await clone(token, owner, repo, ref);
+            if (subrepoSubdirectory) {
+                coreExports.info(`Looking in subrepoSubdirectory: ${subrepoSubdirectory} `);
+                const tempDirName = 'temporary-docs-dir';
+                await ioExports.mv(require$$1$5.join(repo, subrepoSubdirectory), tempDirName);
                 await ioExports.rmRF(repo);
-                await clone(token, owner, repo, ref);
-                if (subrepoSubdirectory) {
-                    coreExports.info(`Looking in subrepoSubdirectory: ${subrepoSubdirectory} `);
-                    const tempDirName = 'temporary-docs-dir';
-                    await ioExports.mv(require$$1$5.join(repo, subrepoSubdirectory), tempDirName);
-                    await ioExports.rmRF(repo);
-                    await ioExports.mv(tempDirName, repo);
-                }
-                else {
-                    coreExports.info('No subdirectory specified');
-                    await ioExports.rmRF(`${repo}/.git`);
-                }
-                const subConfig = JSON.parse(await readFile(require$$1$5.join(repo, 'docs.json'), 'utf-8'));
-                coreExports.info(`Read subConfig of ${repo}, merging navigation...`);
-                wipConfig = mergeConfigs(wipConfig, subConfig, repo);
+                await ioExports.mv(tempDirName, repo);
             }
-            coreExports.info('Writing updated docs.json');
-            await writeFile('docs.json', JSON.stringify(wipConfig, null, 2));
-            await commitAndPush(targetBranch, force);
+            else {
+                coreExports.info('No subdirectory specified');
+                await ioExports.rmRF(`${repo}/.git`);
+            }
+            const subConfig = JSON.parse(await readFile(require$$1$5.join(repo, 'docs.json'), 'utf-8'));
+            coreExports.info(`Read subConfig of ${repo}, merging navigation...`);
+            wipConfig = mergeConfigs(wipConfig, subConfig, repo);
         }
-        finally {
-            resetToken?.();
-        }
+        coreExports.info('Writing updated docs.json');
+        await writeFile('docs.json', JSON.stringify(wipConfig, null, 2));
+        await commitAndPush(targetBranch, force);
     }
     catch (error) {
-        // Fail the workflow run if an error occurs
         if (error instanceof Error)
             coreExports.setFailed(error.message);
+    }
+    finally {
+        await clearToken();
     }
 }
 
