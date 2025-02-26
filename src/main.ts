@@ -48,7 +48,7 @@ export async function run(): Promise<void> {
       ) as MintConfig
 
       core.info(`Read subConfig of ${repo}, merging navigation...`)
-      wipConfig = mergeConfigs(wipConfig, subConfig, `docs/${repo}`)
+      wipConfig = mergeConfigs(wipConfig, subConfig, repo)
       core.info(`merged subconfig of ${repo}`)
 
       core.info(`Extracting docs from ${repo}/docs...`)
