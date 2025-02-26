@@ -41,13 +41,13 @@ export async function run(): Promise<void> {
     for (const {
       owner,
       repo,
-      ref,
+      ref: branch,
       subdirectory: subrepoSubdirectory
     } of repos) {
       core.info(`Processing repository: ${owner}/${repo}`)
       await io.rmRF(repo)
 
-      await git.clone(token, owner, repo, ref)
+      await git.clone(token, owner, repo, branch)
 
       if (subrepoSubdirectory) {
         core.info(`Looking in subrepoSubdirectory: ${subrepoSubdirectory} `)
@@ -66,6 +66,8 @@ export async function run(): Promise<void> {
 
       core.info(`Read subConfig of ${repo}, merging navigation...`)
       wipConfig = mergeConfigs(wipConfig, subConfig, repo)
+      core.info(`merged subconfig of ${repo}`)
+      core.info(`subconfig: ${JSON.stringify(subConfig, null, 2)}`)
     }
 
     core.info('Writing updated docs.json')

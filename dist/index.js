@@ -34232,10 +34232,10 @@ async function run() {
         const mainConfig = JSON.parse(await readFile('docs.json', 'utf-8'));
         await setToken(token);
         let wipConfig = mainConfig;
-        for (const { owner, repo, ref, subdirectory: subrepoSubdirectory } of repos) {
+        for (const { owner, repo, ref: branch, subdirectory: subrepoSubdirectory } of repos) {
             coreExports.info(`Processing repository: ${owner}/${repo}`);
             await ioExports.rmRF(repo);
-            await clone(token, owner, repo, ref);
+            await clone(token, owner, repo, branch);
             if (subrepoSubdirectory) {
                 coreExports.info(`Looking in subrepoSubdirectory: ${subrepoSubdirectory} `);
                 const tempDirName = 'temporary-docs-dir';
@@ -34250,6 +34250,8 @@ async function run() {
             const subConfig = JSON.parse(await readFile(require$$1$5.join(repo, 'docs.json'), 'utf-8'));
             coreExports.info(`Read subConfig of ${repo}, merging navigation...`);
             wipConfig = mergeConfigs(wipConfig, subConfig, repo);
+            coreExports.info(`merged subconfig of ${repo}`);
+            coreExports.info(`subconfig: ${JSON.stringify(subConfig, null, 2)}`);
         }
         coreExports.info('Writing updated docs.json');
         await writeFile('docs.json', JSON.stringify(wipConfig, null, 2));
