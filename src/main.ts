@@ -11,7 +11,6 @@ type Repo = {
   owner: string
   repo: string
   ref?: string
-  subdirectory?: string
 }
 
 /**
@@ -38,27 +37,11 @@ export async function run(): Promise<void> {
 
     await git.setToken(token)
     let wipConfig = mainConfig
-    for (const {
-      owner,
-      repo,
-      ref: branch,
-      subdirectory: subrepoSubdirectory
-    } of repos) {
+    for (const { owner, repo, ref: branch } of repos) {
       core.info(`Processing repository: ${owner}/${repo}`)
       await io.rmRF(repo)
-
       await git.clone(token, owner, repo, branch)
-
-      if (subrepoSubdirectory) {
-        core.info(`Looking in subrepoSubdirectory: ${subrepoSubdirectory} `)
-        const tempDirName = 'temporary-docs-dir'
-        await io.mv(path.join(repo, subrepoSubdirectory), tempDirName)
-        await io.rmRF(repo)
-        await io.mv(tempDirName, repo)
-      } else {
-        core.info('No subdirectory specified')
-        await io.rmRF(`${repo}/.git`)
-      }
+      await io.rmRF(`${repo}/.git`)
 
       const subConfig = JSON.parse(
         await readFile(path.join(repo, 'docs.json'), 'utf-8')
