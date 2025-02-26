@@ -30,8 +30,8 @@ test("main config's tabs are merged with sub config's tabs", () => {
   const result = mergeConfigs(main, sub, 'prefix')
   expect(result.navigation.tabs[0].pages).toStrictEqual(['A'])
   expect(result.navigation.tabs[1].pages).toStrictEqual([
-    'prefix/B',
-    'prefix/C'
+    'docs/prefix/B',
+    'docs/prefix/C'
   ])
 })
 
@@ -64,7 +64,7 @@ test("sub config's pages are prefixed", () => {
     'docs/should_not_get_prefixed'
   ])
   expect(result.navigation.tabs[1].pages).toStrictEqual([
-    'expected_prefix/docs/should_get_prefixed'
+    'docs/expected_prefix/should_get_prefixed'
   ])
 })
 
@@ -92,7 +92,7 @@ test('it handles groups', () => {
     groups: [
       {
         group: 'Overview',
-        pages: ['expected_prefix/docs/getting_started']
+        pages: ['docs/expected_prefix/getting_started']
       }
     ]
   })
@@ -131,11 +131,11 @@ test('it handles multiple nested groups', () => {
     groups: [
       {
         group: 'Overview',
-        pages: ['expected_prefix/docs/getting_started']
+        pages: ['docs/expected_prefix/getting_started']
       },
       {
         group: 'Advanced',
-        pages: ['expected_prefix/docs/advanced']
+        pages: ['docs/expected_prefix/advanced']
       }
     ]
   })
@@ -160,7 +160,7 @@ test('with realistic configurations', () => {
           groups: [
             {
               group: 'Documentation',
-              pages: ['lenders-api/docs/api-reference/resources']
+              pages: ['docs/lenders-api/api-reference/resources']
             }
           ]
         },
@@ -169,23 +169,23 @@ test('with realistic configurations', () => {
           groups: [
             {
               group: 'Getting Started',
-              pages: ['lenders-api/docs/api-reference/getting_started']
+              pages: ['docs/lenders-api/api-reference/getting_started']
             },
             {
               group: 'Endpoint Examples',
               pages: [
-                'lenders-api/docs/api-reference/endpoint/get_auth_token',
-                'lenders-api/docs/api-reference/endpoint/submit_loan_application',
-                'lenders-api/docs/api-reference/endpoint/shop_loan_application',
-                'lenders-api/docs/api-reference/endpoint/get_shopped_loan_application',
-                'lenders-api/docs/api-reference/endpoint/post_consent',
-                'lenders-api/docs/api-reference/endpoint/schedule_call',
-                'lenders-api/docs/api-reference/endpoint/call_me_now'
+                'docs/lenders-api/api-reference/endpoint/get_auth_token',
+                'docs/lenders-api/api-reference/endpoint/submit_loan_application',
+                'docs/lenders-api/api-reference/endpoint/shop_loan_application',
+                'docs/lenders-api/api-reference/endpoint/get_shopped_loan_application',
+                'docs/lenders-api/api-reference/endpoint/post_consent',
+                'docs/lenders-api/api-reference/endpoint/schedule_call',
+                'docs/lenders-api/api-reference/endpoint/call_me_now'
               ]
             },
             {
               group: 'Changelog',
-              pages: ['lenders-api/docs/api-reference/changelog']
+              pages: ['docs/lenders-api/api-reference/changelog']
             }
           ]
         }

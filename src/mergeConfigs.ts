@@ -1,3 +1,4 @@
+import path from 'path'
 export default function mergeConfigs(main: any, sub: any, prefix: string) {
   const mainTabs = main?.navigation?.tabs || []
   const subTabs = sub?.navigation?.tabs || []
@@ -19,7 +20,10 @@ function prefixPagesInObjectGraph(obj: any, prefix: string): any {
   if (typeof obj !== 'object' || obj === null) return obj
 
   if (Array.isArray(obj.pages)) {
-    obj.pages = obj.pages.map((page: string) => `${prefix}/${page}`)
+    obj.pages = obj.pages.map((page: string) => {
+      page = page.replace(/^docs\//, '') // Strip leading "docs/"
+      return path.join('docs', prefix, page)
+    })
   }
 
   for (const key in obj) {
