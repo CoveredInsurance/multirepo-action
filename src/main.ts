@@ -48,9 +48,14 @@ export async function run(): Promise<void> {
       ) as MintConfig
 
       core.info(`Read subConfig of ${repo}, merging navigation...`)
-      wipConfig = mergeConfigs(wipConfig, subConfig, repo)
+      wipConfig = mergeConfigs(wipConfig, subConfig, `docs/${repo}`)
       core.info(`merged subconfig of ${repo}`)
       core.info(`subconfig: ${JSON.stringify(subConfig, null, 2)}`)
+
+      core.info(`Extracting docs from ${repo}/docs...`)
+      await io.mv(`${repo}/docs`, `docs/${repo}`)
+      core.info(`Deleting source directory ${repo}...`)
+      await io.rmRF(repo)
     }
 
     core.info('Writing updated docs.json')
