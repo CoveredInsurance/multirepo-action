@@ -1,5 +1,4 @@
 import path from 'path'
-import * as core from '@actions/core'
 
 export default function mergeConfigs(main: any, sub: any, repoName: string) {
   const mainTabs = main?.navigation?.tabs || []
@@ -24,9 +23,7 @@ function repoNamePagesInObjectGraph(obj: any, repoName: string): any {
   if (Array.isArray(obj.pages)) {
     obj.pages = obj.pages.map((page: string) => {
       page = page.replace(/^docs\//, '') // Strip leading "docs/"
-      const newPage = path.join('docs', repoName, page)
-      core.info(`Changed page from ${page} to ${newPage}`)
-      return newPage
+      return path.join('docs', repoName, page)
     })
   }
 
