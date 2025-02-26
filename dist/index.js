@@ -34244,7 +34244,7 @@ async function run() {
             await ioExports.rmRF(`${repo}/.git`);
             const subConfig = JSON.parse(await readFile(require$$1$5.join(repo, 'docs.json'), 'utf-8'));
             coreExports.info(`Read subConfig of ${repo}, merging navigation...`);
-            wipConfig = mergeConfigs(wipConfig, subConfig, `docs/${repo}`);
+            wipConfig = mergeConfigs(wipConfig, subConfig, repo);
             coreExports.info(`merged subconfig of ${repo}`);
             coreExports.info(`Extracting docs from ${repo}/docs...`);
             await ioExports.mv(`${repo}/docs`, `docs/${repo}`);
