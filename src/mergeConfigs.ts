@@ -23,7 +23,7 @@ function prefixPagesInObjectGraph(obj: any, prefix: string): any {
   }
 
   for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
       const value = obj[key]
       if (typeof value === 'object' && value !== null) {
         if (Array.isArray(value)) {
