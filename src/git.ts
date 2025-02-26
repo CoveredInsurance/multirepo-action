@@ -11,6 +11,7 @@ export const execOrThrow: (
     throw Error(`error running command: ${args[0]} ${args[1]?.join(' ') ?? ''}`)
 }
 
+const headerKey = 'http.https://github.com/.extraheader'
 export const setToken = async (token: string) => {
   core.info('Setting GitHub token')
   const encodedToken = Buffer.from(`x-access-token:${token}`, 'utf-8').toString(
@@ -19,7 +20,6 @@ export const setToken = async (token: string) => {
   core.setSecret(encodedToken)
   const headerPlaceholder = 'Authorization: basic ***'
   const headerValue = `Authorization: basic ${encodedToken}`
-  const headerKey = 'http.https://github.com/.extraheader'
   const configPath = '.git/config'
 
   await execOrThrow('git', ['config', '--local', headerKey, headerPlaceholder])
@@ -28,9 +28,9 @@ export const setToken = async (token: string) => {
     configPath,
     configString.replace(headerPlaceholder, headerValue)
   )
-
-  return () =>
-    execOrThrow('git', ['config', '--local', '--unset-all', headerKey])
+}
+export const clearToken = async () => {
+  await execOrThrow('git', ['config', '--local', '--unset-all', headerKey])
 }
 
 export const checkoutBranch = async (branch: string) => {
