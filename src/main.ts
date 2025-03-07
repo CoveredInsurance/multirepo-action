@@ -32,7 +32,7 @@ export async function run(): Promise<void> {
     await git.checkoutBranch(targetBranch)
 
     const mainConfig = JSON.parse(
-      await readFile('docs.json', 'utf-8')
+      await readFile('../docs.json', 'utf-8')
     ) as MintConfig
 
     await git.setToken(token)
