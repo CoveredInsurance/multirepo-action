@@ -43,7 +43,7 @@ export async function run(): Promise<void> {
       await io.rmRF(`${repo}/.git`)
 
       const subConfig = JSON.parse(
-        await readFile(path.join(repo, 'docs.json'), 'utf-8')
+        await readFile(path.join(repo, 'docs/docs.json'), 'utf-8')
       ) as MintConfig
 
       core.info(`Read subConfig of ${repo}, merging navigation...`)
