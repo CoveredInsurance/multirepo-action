@@ -34227,12 +34227,11 @@ async function run() {
         const token = coreExports.getInput('token');
         const repos = parse(coreExports.getInput('repos'));
         const targetBranch = coreExports.getInput('target-branch');
-        const subdirectory = coreExports.getInput('subdirectory');
         const force = coreExports.getBooleanInput('force');
-        coreExports.info(`Changing directory to: ${subdirectory}`);
-        process.chdir(subdirectory);
-        await checkoutBranch(targetBranch);
         const mainConfig = JSON.parse(await readFile('docs.json', 'utf-8'));
+        // core.info(`Changing directory to: ${subdirectory}`)
+        // process.chdir(subdirectory)
+        await checkoutBranch(targetBranch);
         await setToken(token);
         let wipConfig = mainConfig;
         for (const { owner, repo, ref: branch } of repos) {
