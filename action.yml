@@ -13,10 +13,6 @@ inputs:
     description: The branch to which the complete documentation will be pushed
     required: false
     default: main
-  subdirectory:
-    description: Path to the directory containing the main docs.json
-    required: false
-    default: './docs'
   force:
     description: If `true`, will force-push to `target-branch`
     required: false

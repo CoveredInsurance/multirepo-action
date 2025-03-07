@@ -23,15 +23,14 @@ export async function run(): Promise<void> {
     const token = core.getInput('token')
     const repos = parse(core.getInput('repos')) as Repo[]
     const targetBranch = core.getInput('target-branch')
-    const subdirectory = core.getInput('subdirectory')
     const force = core.getBooleanInput('force')
 
     const mainConfig = JSON.parse(
       await readFile('docs.json', 'utf-8')
     ) as MintConfig
 
-    core.info(`Changing directory to: ${subdirectory}`)
-    process.chdir(subdirectory)
+    // core.info(`Changing directory to: ${subdirectory}`)
+    // process.chdir(subdirectory)
 
     await git.checkoutBranch(targetBranch)
 
