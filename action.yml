@@ -16,7 +16,7 @@ inputs:
   subdirectory:
     description: Path to the directory containing the main docs.json
     required: false
-    default: '.'
+    default: './docs'
   force:
     description: If `true`, will force-push to `target-branch`
     required: false
