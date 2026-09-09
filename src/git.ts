@@ -12,14 +12,22 @@ export const execOrThrow: (
 }
 
 const headerKey = 'http.https://github.com/.extraheader'
-export const setToken = async (token: string) => {
-  core.info('Setting GitHub token')
+
+// Registers both the raw token and its encoded form with the runner's log
+// masker before either is used anywhere.
+const basicAuthHeader = (token: string) => {
+  core.setSecret(token)
   const encodedToken = Buffer.from(`x-access-token:${token}`, 'utf-8').toString(
     'base64'
   )
   core.setSecret(encodedToken)
+  return `Authorization: basic ${encodedToken}`
+}
+
+export const setToken = async (token: string) => {
+  core.info('Setting GitHub token')
   const headerPlaceholder = 'Authorization: basic ***'
-  const headerValue = `Authorization: basic ${encodedToken}`
+  const headerValue = basicAuthHeader(token)
   const configPath = '.git/config'
 
   await execOrThrow('git', ['config', '--local', headerKey, headerPlaceholder])
@@ -86,9 +94,16 @@ export const clone = async (
 ) => {
   const args = ['clone', '--depth=1']
   if (branch) args.push('--branch', branch)
-  const url = `https://oauth2:${token}@github.com/${owner}/${repo}`
-  args.push(url)
-  core.info(`url is: ${url}`)
+  args.push(`https://github.com/${owner}/${repo}`)
 
-  await execOrThrow('git', args)
+  // The credential travels via git's environment-based config rather than the
+  // URL or argv, so it never reaches the command echo or the Actions log.
+  await execOrThrow('git', args, {
+    env: {
+      ...(process.env as Record<string, string>),
+      GIT_CONFIG_COUNT: '1',
+      GIT_CONFIG_KEY_0: headerKey,
+      GIT_CONFIG_VALUE_0: basicAuthHeader(token)
+    }
+  })
 }
